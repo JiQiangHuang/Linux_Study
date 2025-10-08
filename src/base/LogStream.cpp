@@ -3,9 +3,9 @@
 #include "TTime.h"
 #include <unistd.h>
 #include <sys/syscall.h>
-
+#include <iostream>
 using namespace tmms::base;
-Logger * tmms::base::g_logger =nullptr;
+Logger *tmms::base::g_logger = nullptr;
 
 static thread_local pid_t thread_id = 0;
 const char *log_string[] = {
@@ -15,7 +15,7 @@ const char *log_string[] = {
     " WARN ",
     " ERROR "};
 
-LogStream::LogStream(Logger * loger, const char *file, int line, LogLevel l, const char *func)
+LogStream::LogStream(Logger *loger, const char *file, int line, LogLevel l, const char *func)
     : logger_(loger)
 {
     const char *file_name = strrchr(file, '/');
@@ -35,15 +35,19 @@ LogStream::LogStream(Logger * loger, const char *file, int line, LogLevel l, con
     stream_ << thread_id;
     stream_ << log_string[l];
     stream_ << "[" << file_name << ":" << line << "]";
-    if(func)
+    if (func)
     {
-        stream_ << "[" << func  << "]";
+        stream_ << "[" << func << "]";
     }
-
 }
 LogStream::~LogStream()
 {
     stream_ << "\n";
-    logger_->Write(stream_.str());
+    if (logger_)
+    {
+        logger_->Write(stream_.str());
+    }
+    else{
+        std::cout<<stream_.str()<<std::endl;
+    }
 }
-
